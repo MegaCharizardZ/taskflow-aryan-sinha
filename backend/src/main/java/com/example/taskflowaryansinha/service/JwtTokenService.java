@@ -2,6 +2,7 @@ package com.example.taskflowaryansinha.service;
 
 import com.example.taskflowaryansinha.config.JwtProperties;
 import com.example.taskflowaryansinha.entity.User;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,18 @@ public class JwtTokenService {
                 .expiration(expiresAt)
                 .signWith(signingKey())
                 .compact();
+    }
+
+    /**
+     * Parses and validates a JWT access token. Throws {@link io.jsonwebtoken.JwtException} if the
+     * token is malformed, expired, or has an invalid signature.
+     */
+    public Claims parseAccessToken(String token) {
+        return Jwts.parser()
+                .verifyWith(signingKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     private SecretKey signingKey() {

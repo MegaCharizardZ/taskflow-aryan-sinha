@@ -1,10 +1,15 @@
 package com.example.taskflowaryansinha.controller;
 
 import com.example.taskflowaryansinha.models.CreateProjectRequest;
+import com.example.taskflowaryansinha.models.ProjectResponse;
+import com.example.taskflowaryansinha.models.ProjectWithTasksResponse;
 import com.example.taskflowaryansinha.models.UpdateProjectRequest;
+import com.example.taskflowaryansinha.service.ProjectService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -24,33 +30,41 @@ import java.util.UUID;
 @Validated
 @RestController
 @RequestMapping("/projects")
+@RequiredArgsConstructor
 public class ProjectController {
 
+    private final ProjectService projectService;
+
     @GetMapping
-    public ResponseEntity<Void> listProjects() {
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
+    public ResponseEntity<List<ProjectResponse>> listProjects() {
+        return ResponseEntity.ok(projectService.listProjects(currentUserId()));
     }
 
     @PostMapping
-    public ResponseEntity<Void> createProject(@Valid @RequestBody CreateProjectRequest request) {
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
+    public ResponseEntity<ProjectResponse> createProject(@Valid @RequestBody CreateProjectRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(projectService.createProject(currentUserId(), request));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Void> getProject(@PathVariable UUID id) {
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
+    public ResponseEntity<ProjectWithTasksResponse> getProject(@PathVariable UUID id) {
+        return ResponseEntity.ok(projectService.getProject(currentUserId(), id));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Void> updateProject(
+    public ResponseEntity<ProjectResponse> updateProject(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateProjectRequest request
     ) {
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
+        return ResponseEntity.ok(projectService.updateProject(currentUserId(), id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProject(@PathVariable UUID id) {
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
+        projectService.deleteProject(currentUserId(), id);
+        return ResponseEntity.noContent().build();
+    }
+
+    private UUID currentUserId() {
+        return UUID.fromString((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
     }
 }

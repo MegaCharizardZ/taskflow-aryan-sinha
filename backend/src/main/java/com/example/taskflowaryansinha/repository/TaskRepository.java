@@ -12,12 +12,13 @@ import java.util.UUID;
 
 public interface TaskRepository extends JpaRepository<Task, UUID> {
 
+    /// For all methods, can also order by priority/ status
     @Query("""
             SELECT t FROM Task t
             WHERE t.project.id = :projectId
               AND (:status IS NULL OR t.status = :status)
-              AND (:assigneeId IS NULL OR (t.assignee IS NOT NULL AND t.assignee.id = :assigneeId))
-            ORDER BY t.createdAt ASC
+              AND (:assigneeId IS NULL OR (t.assignee.id = :assigneeId))
+            ORDER BY t.updatedAt desc
             """)
     List<Task> findByProjectWithOptionalFilters(
             @Param("projectId") UUID projectId,
@@ -28,6 +29,8 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     Optional<Task> findByIdAndProject_Id(UUID id, UUID projectId);
 
     boolean existsByIdAndProject_Owner_Id(UUID id, UUID ownerId);
+
+    boolean existsByIdAndCreatedBy_Id(UUID id, UUID createdById);
 
     /** Deletes all tasks in a project (e.g. before deleting the project). */
     long deleteByProject_Id(UUID projectId);
