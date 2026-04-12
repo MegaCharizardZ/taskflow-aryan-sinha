@@ -1,6 +1,5 @@
 package com.example.taskflowaryansinha.entity;
 
-//import jakarta.persistence.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -31,8 +30,8 @@ public class Project {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
     @NotNull
+    @Column(nullable = false)
     private String name;
 
     @Column(columnDefinition = "text")

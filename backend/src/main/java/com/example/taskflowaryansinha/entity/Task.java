@@ -1,6 +1,9 @@
 package com.example.taskflowaryansinha.entity;
 
+import com.example.taskflowaryansinha.models.TaskPriority;
+import com.example.taskflowaryansinha.models.TaskStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,6 +26,7 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @NotNull
     @Column(nullable = false)
     private String title;
 
@@ -57,13 +61,5 @@ public class Task {
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
-
-    public enum TaskStatus {
-        TODO, IN_PROGRESS, DONE
-    }
-
-    public enum TaskPriority {
-        LOW, MEDIUM, HIGH
-    }
 }
 
