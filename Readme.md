@@ -108,7 +108,7 @@ Flyway manages the schema. Migration files live in `backend/src/main/resources/d
 |---|---|
 | `V1__Initial_Schema.sql` | Creates `users`, `projects`, `tasks` tables and indexes |
 | `V2__Add_task_created_by.sql` | Adds `created_by` column and index to `tasks` |
-| `V3__Seed_data.sql` | Seeds a demo user, project, and tasks for local dev |
+| `V4__Seed_data.sql` | Seeds a demo user, project, and tasks for local dev |
 | `U1`, `U2`, `U3` | Undo migrations (reverse of each V migration above) |
 
 > Undo migrations require Flyway Teams/Enterprise. In Community Edition they serve as a rollback runbook.

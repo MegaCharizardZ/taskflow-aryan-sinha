@@ -17,7 +17,7 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     @Query("""
             SELECT t FROM Task t
             WHERE t.project.id = :projectId
-              AND (:status IS NULL OR t.status = :status)
+              AND (:status IS NULL OR t.taskStatus = :status)
               AND (:assigneeId IS NULL OR (t.assignee.id = :assigneeId))
             ORDER BY t.updatedAt desc
             """)
@@ -36,7 +36,7 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     /** Deletes all tasks in a project (e.g. before deleting the project). */
     long deleteByProject_Id(UUID projectId);
 
-    @Query("SELECT t.assignee.id AS assigneeId, t.status AS status, COUNT(t) AS count FROM Task t " +
-            "WHERE t.project.id = :projectId AND t.assignee IS NOT NULL GROUP BY t.assignee.id, t.status")
+    @Query("SELECT t.assignee.id AS assigneeId, t.taskStatus AS status, COUNT(t) AS count FROM Task t " +
+            "WHERE t.project.id = :projectId AND t.assignee IS NOT NULL GROUP BY t.assignee.id, t.taskStatus")
     List<AssigneeStatusCount> countByAssigneeAndStatusForProject(@Param("projectId") UUID projectId);
 }

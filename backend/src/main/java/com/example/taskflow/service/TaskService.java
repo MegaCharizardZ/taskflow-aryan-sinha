@@ -60,8 +60,8 @@ public class TaskService {
         Task task = Task.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
-                .status(request.getStatus() != null ? request.getStatus().getValue() : com.example.taskflow.models.TaskStatus.TODO.getValue())
-                .priority(request.getPriority() != null ? request.getPriority().getValue() : com.example.taskflow.models.TaskPriority.LOW.getValue())
+                .taskStatus(request.getStatus() != null ? request.getStatus().getValue() : com.example.taskflow.models.TaskStatus.TODO.getValue())
+                .taskPriority(request.getPriority() != null ? request.getPriority().getValue() : com.example.taskflow.models.TaskPriority.LOW.getValue())
                 .project(project)
                 .assignee(assignee)
                 .createdBy(creator)
@@ -94,10 +94,10 @@ public class TaskService {
             task.setDescription(request.getDescription());
         }
         if (request.getStatus() != null) {
-            task.setStatus(request.getStatus().getValue());
+            task.setTaskStatus(request.getStatus().getValue());
         }
         if (request.getPriority() != null) {
-            task.setPriority(request.getPriority().getValue());
+            task.setTaskPriority(request.getPriority().getValue());
         }
         if (request.getDueDate() != null) {
             task.setDueDate(request.getDueDate());
@@ -168,8 +168,8 @@ public class TaskService {
                 .id(t.getId())
                 .title(t.getTitle())
                 .description(t.getDescription())
-                .status(TaskStatus.valueOf(t.getStatus()))
-                .priority(TaskPriority.valueOf(t.getPriority()))
+                .status(TaskStatus.valueOf(t.getTaskStatus()))
+                .priority(TaskPriority.valueOf(t.getTaskPriority()))
                 .projectId(t.getProject().getId())
                 .assigneeId(t.getAssignee() != null ? t.getAssignee().getId() : null)
                 .createdById(t.getCreatedBy() != null ? t.getCreatedBy().getId() : null)

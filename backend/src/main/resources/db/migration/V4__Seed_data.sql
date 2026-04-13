@@ -1,4 +1,4 @@
--- V3__Seed_data.sql
+-- V4__Seed_data.sql
 -- Seed data for development / testing.
 -- Password for test@example.com is: password123  (bcrypt cost 12)
 
@@ -18,7 +18,7 @@ VALUES (
     'a0000000-0000-0000-0000-000000000001'
 ) ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO tasks (id, title, description, status, priority, project_id, assignee_id, created_by)
+INSERT INTO tasks (id, title, description, task_status, task_priority, project_id, assignee_id, created_by)
 VALUES
     (
         'c0000000-0000-0000-0000-000000000001',

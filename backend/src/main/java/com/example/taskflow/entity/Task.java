@@ -33,15 +33,13 @@ public class Task {
     @Column(columnDefinition = "text")
     private String description;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "task_status")
     @Builder.Default
-    private String status = TaskStatus.TODO.getValue();
+    private String taskStatus = TaskStatus.TODO.getValue();
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "task_priority")
     @Builder.Default
-    private String priority = TaskPriority.MEDIUM.getValue();
+    private String taskPriority = TaskPriority.MEDIUM.getValue();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = false)
