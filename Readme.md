@@ -19,8 +19,8 @@ A task management REST API built with Spring Boot 4, PostgreSQL, and JWT authent
 **Only Docker is required.** No Java, Maven, or local PostgreSQL installation needed.
 
 ```bash
-git clone <repo-url>
-cd taskflow
+git clone https://github.com/MegaCharizardZ/taskflow-aryan-sinha.git
+cd taskflow-aryan-sinha
 
 cp .env.example .env
 # open .env and set POSTGRES_USER, POSTGRES_PASSWORD, and JWT_SECRET
