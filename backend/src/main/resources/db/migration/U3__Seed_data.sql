@@ -1,8 +1,14 @@
 -- U3__Seed_data.sql  (undo for V3)
-DELETE FROM tasks   WHERE id IN (
+-- Delete seeded rows in reverse insertion order (tasks → projects → users)
+-- to satisfy FK constraints.
+
+DELETE FROM tasks
+WHERE id IN (
     'c0000000-0000-0000-0000-000000000001',
     'c0000000-0000-0000-0000-000000000002',
     'c0000000-0000-0000-0000-000000000003'
 );
+
 DELETE FROM projects WHERE id = 'b0000000-0000-0000-0000-000000000001';
-DELETE FROM users    WHERE id = 'a0000000-0000-0000-0000-000000000001';
+
+DELETE FROM users WHERE id = 'a0000000-0000-0000-0000-000000000001';

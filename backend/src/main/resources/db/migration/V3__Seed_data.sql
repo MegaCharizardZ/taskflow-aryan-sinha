@@ -24,8 +24,8 @@ VALUES
         'c0000000-0000-0000-0000-000000000001',
         'Set up CI/CD pipeline',
         'Configure GitHub Actions for automated testing and deployment.',
-        'DONE'::task_status_enum,
-        'HIGH'::task_priority_enum,
+        'DONE',
+        'HIGH',
         'b0000000-0000-0000-0000-000000000001',
         'a0000000-0000-0000-0000-000000000001',
         'a0000000-0000-0000-0000-000000000001'
@@ -34,8 +34,8 @@ VALUES
         'c0000000-0000-0000-0000-000000000002',
         'Implement authentication',
         'Add JWT-based login and registration endpoints.',
-        'IN_PROGRESS'::task_status_enum,
-        'HIGH'::task_priority_enum,
+        'IN_PROGRESS',
+        'HIGH',
         'b0000000-0000-0000-0000-000000000001',
         'a0000000-0000-0000-0000-000000000001',
         'a0000000-0000-0000-0000-000000000001'
@@ -44,8 +44,8 @@ VALUES
         'c0000000-0000-0000-0000-000000000003',
         'Write API documentation',
         'Document all endpoints with request/response examples.',
-        'TODO'::task_status_enum,
-        'MEDIUM'::task_priority_enum,
+        'TODO',
+        'MEDIUM',
         'b0000000-0000-0000-0000-000000000001',
         NULL,
         'a0000000-0000-0000-0000-000000000001'

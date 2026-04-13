@@ -1,0 +1,16 @@
+spring:
+  docker:
+    compose:
+      enabled: false
+  flyway:
+    enabled: true        # Flyway auto-config does not fire reliably in the Cucumber test context
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/test
+#  jpa:
+#    hibernate:
+#      ddl-auto: create-drop   # Hibernate creates schema from entities on startup, drops on shutdown
+
+app:
+  jwt:
+    secret: test-secret-for-cucumber-integration-tests-min32!
+    expiration-ms: 86400000
