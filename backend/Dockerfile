@@ -4,11 +4,11 @@ WORKDIR /app
 
 # Copy wrapper + pom separately so dependency layer is cached
 COPY .mvn/ .mvn/
-COPY mvn pom.xml ./
-RUN chmod +x mvnw && mvn dependency:go-offline -q
+COPY mvnw pom.xml ./
+RUN chmod +x mvnw && ./mvnw dependency:go-offline -q
 
 COPY src/ src/
-RUN mvn package -DskipTests -q
+RUN ./mvnw package -DskipTests -q
 
 # ── Stage 2: runtime ─────────────────────────────────────────────────────────
 FROM eclipse-temurin:21-jre-alpine AS runtime
