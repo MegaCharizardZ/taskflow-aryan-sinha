@@ -7,6 +7,7 @@ import com.example.taskflow.models.UpdateProjectRequest;
 import com.example.taskflow.service.ProjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,6 +28,7 @@ import java.util.UUID;
  * Projects API. Mutations on a project (PATCH, DELETE) are restricted to the project owner in the service layer.
  * Listing returns projects the current user owns or has tasks in.
  */
+@Slf4j
 @Validated
 @RestController
 @RequestMapping("/projects")
@@ -37,17 +39,23 @@ public class ProjectController {
 
     @GetMapping
     public ResponseEntity<List<ProjectResponse>> listProjects() {
-        return ResponseEntity.ok(projectService.listProjects(currentUserId()));
+        UUID userId = currentUserId();
+        log.debug("User {} listing projects", userId);
+        return ResponseEntity.ok(projectService.listProjects(userId));
     }
 
     @PostMapping
     public ResponseEntity<ProjectResponse> createProject(@Valid @RequestBody CreateProjectRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(projectService.createProject(currentUserId(), request));
+        UUID userId = currentUserId();
+        log.info("User {} creating project name={}", userId, request.getName());
+        return ResponseEntity.status(HttpStatus.CREATED).body(projectService.createProject(userId, request));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProjectWithTasksResponse> getProject(@PathVariable UUID id) {
-        return ResponseEntity.ok(projectService.getProject(currentUserId(), id));
+        UUID userId = currentUserId();
+        log.debug("User {} fetching project={}", userId, id);
+        return ResponseEntity.ok(projectService.getProject(userId, id));
     }
 
     @PatchMapping("/{id}")
@@ -55,12 +63,16 @@ public class ProjectController {
             @PathVariable UUID id,
             @Valid @RequestBody UpdateProjectRequest request
     ) {
-        return ResponseEntity.ok(projectService.updateProject(currentUserId(), id, request));
+        UUID userId = currentUserId();
+        log.info("User {} updating project={}", userId, id);
+        return ResponseEntity.ok(projectService.updateProject(userId, id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProject(@PathVariable UUID id) {
-        projectService.deleteProject(currentUserId(), id);
+        UUID userId = currentUserId();
+        log.info("User {} deleting project={}", userId, id);
+        projectService.deleteProject(userId, id);
         return ResponseEntity.noContent().build();
     }
 

@@ -13,6 +13,7 @@ import com.example.taskflow.repository.ProjectRepository;
 import com.example.taskflow.repository.TaskRepository;
 import com.example.taskflow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TaskService {
@@ -34,9 +36,11 @@ public class TaskService {
     @Transactional(readOnly = true)
     public List<TaskResponse> listTasks(UUID userId, UUID projectId, TaskStatus status, UUID assigneeId) {
         requireProjectAccess(projectId, userId);
-        return taskRepository.findByProjectWithOptionalFilters(projectId, status, assigneeId).stream()
+        List<TaskResponse> tasks = taskRepository.findByProjectWithOptionalFilters(projectId, status, assigneeId).stream()
                 .map(this::toResponse)
                 .toList();
+        log.debug("Listed {} tasks for projectId={} userId={} status={} assignee={}", tasks.size(), projectId, userId, status, assigneeId);
+        return tasks;
     }
 
     @Transactional
@@ -63,7 +67,11 @@ public class TaskService {
                 .dueDate(request.getDueDate())
                 .build();
 
-        return toResponse(taskRepository.save(task));
+        TaskResponse response = toResponse(taskRepository.save(task));
+        log.info("Task created: taskId={} title={} projectId={} createdBy={} assignee={}",
+                response.getId(), response.getTitle(), projectId, userId,
+                assignee != null ? assignee.getId() : null);
+        return response;
     }
 
     @Transactional
@@ -74,6 +82,7 @@ public class TaskService {
         boolean isCreator  = task.getCreatedBy() != null && userId.equals(task.getCreatedBy().getId());
         boolean isAssignee = task.getAssignee()  != null && userId.equals(task.getAssignee().getId());
         if (!isCreator && !isAssignee) {
+            log.warn("Access denied: userId={} attempted to update taskId={}", userId, taskId);
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden");
         }
 
@@ -98,7 +107,9 @@ public class TaskService {
             task.setAssignee(assignee);
         }
 
-        return toResponse(taskRepository.save(task));
+        TaskResponse response = toResponse(taskRepository.save(task));
+        log.info("Task updated: taskId={} by userId={}", taskId, userId);
+        return response;
     }
 
     @Transactional
@@ -111,10 +122,12 @@ public class TaskService {
         boolean isTaskCreator = taskRepository.existsByIdAndCreatedBy_Id(taskId, userId);
 
         if (!isProjectOwner && !isTaskCreator) {
+            log.warn("Access denied: userId={} attempted to delete taskId={}", userId, taskId);
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden");
         }
 
         taskRepository.deleteById(taskId);
+        log.info("Task deleted: taskId={} by userId={}", taskId, userId);
     }
 
     @Transactional(readOnly = true)
@@ -144,6 +157,7 @@ public class TaskService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
         }
         if (!projectRepository.isAccessibleByUser(projectId, userId)) {
+            log.warn("Access denied: userId={} has no access to projectId={}", userId, projectId);
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden");
         }
     }

@@ -1,5 +1,6 @@
 package com.example.taskflow.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -11,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -27,6 +29,7 @@ public class GlobalExceptionHandler {
                         (first, second) -> first  // keep first message if the same field has multiple errors
                 ));
 
+        log.warn("Validation failed: {}", fields);
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("error", "validation failed");
         body.put("fields", fields);
@@ -39,6 +42,12 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<Map<String, Object>> handleResponseStatusException(ResponseStatusException ex) {
+        if (ex.getStatusCode().is5xxServerError()) {
+            log.error("Server error {}: {}", ex.getStatusCode(), ex.getReason(), ex);
+        } else {
+            log.debug("Client error {}: {}", ex.getStatusCode(), ex.getReason());
+        }
+
         Map<String, Object> body = new LinkedHashMap<>();
         if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
             body.put("error", "not found");

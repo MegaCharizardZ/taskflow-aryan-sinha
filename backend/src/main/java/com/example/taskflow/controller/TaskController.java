@@ -8,6 +8,7 @@ import com.example.taskflow.models.UpdateTaskRequest;
 import com.example.taskflow.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,6 +29,7 @@ import java.util.UUID;
  * Tasks API under projects plus task-scoped update/delete.
  * DELETE /tasks/{id}: allowed only for the project owner or the user who created the task.
  */
+@Slf4j
 @Validated
 @RestController
 @RequiredArgsConstructor
@@ -37,7 +39,9 @@ public class TaskController {
 
     @GetMapping("/projects/{projectId}/stats")
     public ResponseEntity<List<AssigneeTaskStats>> getProjectStats(@PathVariable UUID projectId) {
-        return ResponseEntity.ok(taskService.getProjectStats(currentUserId(), projectId));
+        UUID userId = currentUserId();
+        log.debug("User {} fetching stats for project={}", userId, projectId);
+        return ResponseEntity.ok(taskService.getProjectStats(userId, projectId));
     }
 
     @GetMapping("/projects/{projectId}/tasks")
@@ -46,7 +50,9 @@ public class TaskController {
             @RequestParam(name = "status", required = false) TaskStatus status,
             @RequestParam(name = "assignee", required = false) UUID assignee
     ) {
-        return ResponseEntity.ok(taskService.listTasks(currentUserId(), projectId, status, assignee));
+        UUID userId = currentUserId();
+        log.debug("User {} listing tasks for project={} status={} assignee={}", userId, projectId, status, assignee);
+        return ResponseEntity.ok(taskService.listTasks(userId, projectId, status, assignee));
     }
 
     @PostMapping("/projects/{projectId}/tasks")
@@ -54,7 +60,9 @@ public class TaskController {
             @PathVariable UUID projectId,
             @Valid @RequestBody CreateTaskRequest request
     ) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(taskService.createTask(currentUserId(), projectId, request));
+        UUID userId = currentUserId();
+        log.info("User {} creating task in project={}", userId, projectId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(taskService.createTask(userId, projectId, request));
     }
 
     @PatchMapping("/tasks/{id}")
@@ -62,12 +70,16 @@ public class TaskController {
             @PathVariable UUID id,
             @Valid @RequestBody UpdateTaskRequest request
     ) {
-        return ResponseEntity.ok(taskService.updateTask(currentUserId(), id, request));
+        UUID userId = currentUserId();
+        log.info("User {} updating task={}", userId, id);
+        return ResponseEntity.ok(taskService.updateTask(userId, id, request));
     }
 
     @DeleteMapping("/tasks/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable UUID id) {
-        taskService.deleteTask(currentUserId(), id);
+        UUID userId = currentUserId();
+        log.info("User {} deleting task={}", userId, id);
+        taskService.deleteTask(userId, id);
         return ResponseEntity.noContent().build();
     }
 

@@ -6,6 +6,7 @@ import com.example.taskflow.models.RegisterRequest;
 import com.example.taskflow.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  *   <li>All other API routes require {@code Authorization: Bearer &lt;token&gt;} (enforced via security config, not this controller).</li>
  * </ul>
  */
+@Slf4j
 @Validated
 @RestController
 @RequestMapping("/auth")
@@ -32,12 +34,14 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest request) {
+        log.info("Register request for email={}", request.getEmail());
         authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+        log.info("Login attempt for email={}", request.getEmail());
         return ResponseEntity.ok(authService.login(request));
     }
 }

@@ -6,6 +6,7 @@ import com.example.taskflow.models.LoginResponse;
 import com.example.taskflow.models.RegisterRequest;
 import com.example.taskflow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -26,6 +28,7 @@ public class AuthService {
         String normalizedEmail = request.getEmail().toLowerCase();
 
         if (userRepository.existsByEmail(normalizedEmail)) {
+            log.warn("Registration rejected — email already registered: {}", normalizedEmail);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already registered");
         }
 
@@ -37,8 +40,10 @@ public class AuthService {
 
         try {
             userRepository.save(user);
+            log.info("User registered successfully: email={}", normalizedEmail);
         } catch (DataIntegrityViolationException ex) {
             // Race condition: another request registered the same email between the check and the insert
+            log.warn("Registration race condition for email={}", normalizedEmail);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already registered");
         }
     }
@@ -48,12 +53,17 @@ public class AuthService {
         String normalizedEmail = request.getEmail().toLowerCase();
 
         User user = userRepository.findByEmail(normalizedEmail)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials"));
+                .orElseThrow(() -> {
+                    log.warn("Login failed — no account found for email={}", normalizedEmail);
+                    return new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+                });
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            log.warn("Login failed — wrong password for email={}", normalizedEmail);
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
         }
 
+        log.info("User logged in: userId={} email={}", user.getId(), normalizedEmail);
         return new LoginResponse(jwtTokenService.createAccessToken(user));
     }
 }

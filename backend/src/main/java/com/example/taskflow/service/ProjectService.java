@@ -12,6 +12,7 @@ import com.example.taskflow.repository.ProjectRepository;
 import com.example.taskflow.repository.TaskRepository;
 import com.example.taskflow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProjectService {
@@ -30,9 +32,11 @@ public class ProjectService {
 
     @Transactional(readOnly = true)
     public List<ProjectResponse> listProjects(UUID userId) {
-        return projectRepository.findVisibleToUser(userId).stream()
+        List<ProjectResponse> projects = projectRepository.findVisibleToUser(userId).stream()
                 .map(this::toResponse)
                 .toList();
+        log.debug("Listed {} projects for userId={}", projects.size(), userId);
+        return projects;
     }
 
     @Transactional
@@ -43,7 +47,9 @@ public class ProjectService {
                 .description(request.getDescription())
                 .owner(owner)
                 .build();
-        return toResponse(projectRepository.save(project));
+        ProjectResponse response = toResponse(projectRepository.save(project));
+        log.info("Project created: projectId={} name={} ownerId={}", response.getId(), response.getName(), userId);
+        return response;
     }
 
     @Transactional(readOnly = true)
@@ -52,10 +58,12 @@ public class ProjectService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "not found"));
 
         if (!projectRepository.isAccessibleByUser(projectId, userId)) {
+            log.warn("Access denied: userId={} attempted to access projectId={}", userId, projectId);
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden");
         }
 
         List<Task> tasks = taskRepository.findByProjectWithOptionalFilters(projectId, null, null);
+        log.debug("Fetched project={} with {} tasks for userId={}", projectId, tasks.size(), userId);
         return toWithTasksResponse(project, tasks);
     }
 
@@ -70,7 +78,9 @@ public class ProjectService {
             project.setDescription(request.getDescription());
         }
 
-        return toResponse(projectRepository.save(project));
+        ProjectResponse response = toResponse(projectRepository.save(project));
+        log.info("Project updated: projectId={} by userId={}", projectId, userId);
+        return response;
     }
 
     @Transactional
@@ -78,6 +88,7 @@ public class ProjectService {
         Project project = findAsOwnerOrThrow(projectId, userId);
         taskRepository.deleteByProject_Id(projectId);
         projectRepository.delete(project);
+        log.info("Project deleted: projectId={} by userId={}", projectId, userId);
     }
 
     // ── Helpers ─────────────────────────────────────────────────────────────
@@ -90,7 +101,10 @@ public class ProjectService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
         }
         return projectRepository.findByIdAndOwner_Id(projectId, userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden"));
+                .orElseThrow(() -> {
+                    log.warn("Access denied: userId={} is not the owner of projectId={}", userId, projectId);
+                    return new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden");
+                });
     }
 
     private ProjectResponse toResponse(Project p) {
