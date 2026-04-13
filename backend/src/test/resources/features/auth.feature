@@ -69,3 +69,14 @@ Feature: Authentication and Authorization
     And I log in with email "intruder@example.com" and password "intruderPass1!"
     When I GET the previously created project with the obtained token
     Then the response status should be 403
+
+  # Scenario 10 - end-to-end happy path
+  Scenario: Full flow — register, blocked without token, login, create project, create task, view stats
+    Given a user is registered with email "dave@example.com" and password "davePass1!"
+    When I try to create a project without a token
+    Then the response status should be 401
+    And I log in with email "dave@example.com" and password "davePass1!"
+    And I create a project named "Dave's Project"
+    And I create a task for that project
+    When I GET the stats for the project
+    Then the response status should be 200

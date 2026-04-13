@@ -34,14 +34,14 @@ public class Task {
     private String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "task_status")
     @Builder.Default
-    private TaskStatus status = TaskStatus.TODO;
+    private String status = TaskStatus.TODO.getValue();
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "task_priority")
     @Builder.Default
-    private TaskPriority priority = TaskPriority.MEDIUM;
+    private String priority = TaskPriority.MEDIUM.getValue();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = false)

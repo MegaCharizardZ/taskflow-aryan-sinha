@@ -6,7 +6,9 @@ import com.example.taskflow.entity.User;
 import com.example.taskflow.models.CreateProjectRequest;
 import com.example.taskflow.models.ProjectResponse;
 import com.example.taskflow.models.ProjectWithTasksResponse;
+import com.example.taskflow.models.TaskPriority;
 import com.example.taskflow.models.TaskResponse;
+import com.example.taskflow.models.TaskStatus;
 import com.example.taskflow.models.UpdateProjectRequest;
 import com.example.taskflow.repository.ProjectRepository;
 import com.example.taskflow.repository.TaskRepository;
@@ -133,8 +135,8 @@ public class ProjectService {
                 .id(t.getId())
                 .title(t.getTitle())
                 .description(t.getDescription())
-                .status(t.getStatus())
-                .priority(t.getPriority())
+                .status(TaskStatus.valueOf(t.getStatus()))
+                .priority(TaskPriority.valueOf(t.getPriority()))
                 .projectId(t.getProject().getId())
                 .assigneeId(t.getAssignee() != null ? t.getAssignee().getId() : null)
                 .createdById(t.getCreatedBy() != null ? t.getCreatedBy().getId() : null)

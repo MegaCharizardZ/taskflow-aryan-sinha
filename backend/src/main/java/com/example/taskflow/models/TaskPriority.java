@@ -1,13 +1,18 @@
 package com.example.taskflow.models;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-@Getter
-@RequiredArgsConstructor
 public enum TaskPriority {
-    LOW("LOW"), MEDIUM("MEDIUM"), HIGH("HIGH");
+    LOW, MEDIUM, HIGH;
 
-    private final String value;
+    @JsonValue
+    public String getValue() {
+        return name();
+    }
 
+    @JsonCreator
+    public static TaskPriority fromValue(String value) {
+        return TaskPriority.valueOf(value);
+    }
 }

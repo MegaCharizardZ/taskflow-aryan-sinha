@@ -1,13 +1,18 @@
 package com.example.taskflow.models;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-@Getter
-@RequiredArgsConstructor
 public enum TaskStatus {
-    TODO("TODO"), IN_PROGRESS("IN_PROGRESS"), DONE("DONE");
+    TODO, IN_PROGRESS, DONE;
 
-    private final String value;
+    @JsonValue
+    public String getValue() {
+        return name();
+    }
 
+    @JsonCreator
+    public static TaskStatus fromValue(String value) {
+        return TaskStatus.valueOf(value);
+    }
 }

@@ -17,13 +17,15 @@ CREATE TABLE projects (
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Enum types for tasks
+
 -- Create tasks table
 CREATE TABLE tasks (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title VARCHAR(255) NOT NULL,
     description TEXT,
-    status VARCHAR(50) NOT NULL DEFAULT 'TODO',
-    priority VARCHAR(50) NOT NULL DEFAULT 'MEDIUM',
+    task_status varchar(250) NOT NULL DEFAULT 'TODO',
+    task_priority varchar(250) NOT NULL DEFAULT 'MEDIUM',
     project_id UUID NOT NULL REFERENCES projects(id),
     assignee_id UUID REFERENCES users(id),
     due_date DATE,

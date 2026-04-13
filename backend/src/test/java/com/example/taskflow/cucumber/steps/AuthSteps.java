@@ -93,6 +93,36 @@ public class AuthSteps {
                 .toEntity(String.class);
     }
 
+    @When("I try to create a project without a token")
+    public void createProjectWithoutToken() {
+        lastResponse = restClient.post()
+                .uri(url("/projects"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("{\"name\": \"Unauthorized Project\"}")
+                .retrieve()
+                .toEntity(String.class);
+    }
+
+    @And("I create a task for that project")
+    public void createTaskForProject() {
+        restClient.post()
+                .uri(url("/projects/" + lastCreatedId + "/tasks"))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + authToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("{\"title\": \"Test Task\", \"status\": \"TODO\", \"priority\": \"MEDIUM\"}")
+                .retrieve()
+                .toBodilessEntity();
+    }
+
+    @When("I GET the stats for the project")
+    public void getStatsForProject() {
+        lastResponse = restClient.get()
+                .uri(url("/projects/" + lastCreatedId + "/stats"))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + authToken)
+                .retrieve()
+                .toEntity(String.class);
+    }
+
     // ── When — POST ───────────────────────────────────────────────────────────
 
     @When("I POST to {string} with body:")

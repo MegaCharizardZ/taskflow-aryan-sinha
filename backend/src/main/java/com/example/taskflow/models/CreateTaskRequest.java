@@ -22,9 +22,9 @@ public class CreateTaskRequest {
     @Size(max = 10_000)
     private String description;
 
-    private TaskStatus status;
+    private TaskStatus status = TaskStatus.TODO;
 
-    private TaskPriority priority;
+    private TaskPriority priority = TaskPriority.LOW;
 
     private UUID assignee;
 
